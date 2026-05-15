@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  # --- DATABASE UTAMA (POSTGRESQL) ---
+  db:
+    image: postgres:16-alpine
+    container_name: admin-dashboard-db
+    ports:
+      - "5433:5432" # Diakses dari komputer lokal lewat port 5433
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password_kamu
+      POSTGRES_DB: admin-dashboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # --- CACHE & SESSION STORE (REDIS) ---
+  redis:
+    image: redis:7-alpine
+    container_name: admin-dashboard-redis
+    ports:
+      - "6379:6379" # Port standar Redis untuk diakses oleh Next.js/ioredis
+    volumes:
+      - redis_data:/data # Menyimpan data Redis secara persisten ke volume Docker
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data: # Mendaftarkan volume baru khusus untuk data Redis
