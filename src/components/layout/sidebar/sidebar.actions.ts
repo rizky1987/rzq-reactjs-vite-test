@@ -49,8 +49,8 @@ export const menus: MenuItem[] = [
   */
 
   {
-    title: "Products",
-    href: "/products",
+    title: "Product",
+    href: "/product",
     icon: "fas fa-box",
     roles: ["ADMIN", "USER"],
   },
