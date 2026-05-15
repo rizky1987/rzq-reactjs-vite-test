@@ -1,3 +1,5 @@
+"use client"; 
+
 interface DataGridProps {
   title: string;
   columns: { key: string; label: string }[];
