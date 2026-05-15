@@ -3,12 +3,22 @@ import { useState } from 'react';
 
 const Topbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
-    const userName = localStorage.getItem('name') || 'Douglas McGee';
 
-  const handleLogout = () => {
-    localStorage.clear();
+const handleLogout = async () => {
+  try {
+    // 1. Tembak API logout ke backend
+    await fetch('/api/auth/logout', { method: 'POST' });
+    
+    // Jika perlu membaca response data di masa depan, tinggal uncomment bawah ini:
+    // const data = await res.json();
+    
+  } catch (error) {
+    console.error('Terjadi kesalahan saat logout API:', error);
+  } finally {
+    // 2. Alihkan halaman ke login (taruh di finally agar tetap pindah walau API error)
     window.location.href = '/login';
-  };
+  }
+};
 
   return (
     <nav className="sticky top-0 z-30 flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 shadow-sm">
@@ -66,7 +76,7 @@ const Topbar = () => {
             className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-all focus:outline-none"
           >
             <span className="hidden lg:inline text-sm font-medium text-gray-600">
-              {userName}
+              {/* {userName} */}
             </span>
             <img 
               className="h-8 w-8 rounded-full border-2 border-blue-500 object-cover" 
