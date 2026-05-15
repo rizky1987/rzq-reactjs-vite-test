@@ -22,18 +22,24 @@ export async function POST(request: Request) {
 
     // 3. Buat JWT Token (Masa berlaku 1 jam)
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role : user.role },
       process.env.JWT_SECRET!,
       { expiresIn: '1h' }
     );
 
+    const sessionData = {
+      userId: user.id,
+      email: user.email,
+      role: user.role // Penting agar Sidebar tahu role user ini apa
+    };
+
     // 4. Simpan ke Redis dengan TTL 3600 detik (1 jam)
     // Format Key: token:[string_token_jwt]
-    await redis.set(`token:${token}`, user.id, 'EX', 3600);
+    await redis.set(`session:${token}`, JSON.stringify(sessionData), 'EX', 3600);
 
     // 5. Kembalikan response berupa HTTP-Only Cookie demi keamanan dari XSS
     const response = NextResponse.json(
-      { message: 'Login Berhasil', user: { name: user.name, email: user.email } },
+      { message: 'Login Berhasil', user: { name: user.name, email: user.email, role : user.role } },
       { status: 200 }
     );
 
