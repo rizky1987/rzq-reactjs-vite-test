@@ -30,7 +30,20 @@ export default async function Sidebar() {
       {/* Bagian Atas / Logo Area */}
       <div className="p-4 border-b border-blue-600/50 flex items-center h-20">
         <span className="font-bold text-xl tracking-wider block group-[.data-closed]:hidden truncate">
-          🚀 DASHBOARD
+          <Link
+            key='/profile'
+            href='/profile'
+            className="flex items-center rounded-lg px-6 py-2 hover:bg-blue-800 transition-colors group"
+            title='Profile' // Tetap memunculkan tooltip kecil saat sidebar mengecil
+          >
+            {/* Icon tetep terlihat di tengah saat sidebar mengecil */}
+            <i className="fas fa-user w-5 text-center text-lg" />
+            
+            {/* Teks menu otomatis hilang dengan efek opacity jika dibungkus CSS flex group */}
+            <span className="ml-4 transition-opacity duration-200 block [.data-closed_&]:opacity-0 [.data-closed_&]:w-0 truncate">
+              Profile
+            </span>
+          </Link>
         </span>
       </div>
 
