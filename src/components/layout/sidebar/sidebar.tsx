@@ -41,7 +41,7 @@ export default async function Sidebar() {
             
             {/* Teks menu otomatis hilang dengan efek opacity jika dibungkus CSS flex group */}
             <span className="ml-4 transition-opacity duration-200 block [.data-closed_&]:opacity-0 [.data-closed_&]:w-0 truncate">
-              Profile
+              Curriculum Vitae
             </span>
           </Link>
         </span>

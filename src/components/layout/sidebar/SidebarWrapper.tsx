@@ -35,10 +35,6 @@ export default function SidebarWrapper({ children }: SidebarWrapperProps) {
           </svg>
         </button>
 
-        {/* 
-          Mengalirkan state isOpen ke elemen children dengan trik CSS global variabel 
-          atau membiarkan children menyesuaikan kelas induknya 
-        */}
         <div className={`w-full overflow-hidden ${isOpen ? "data-open" : "data-closed"}`}>
           {children}
         </div>
