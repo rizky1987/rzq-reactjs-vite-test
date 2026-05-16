@@ -25,7 +25,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email atau password salah' }, { status: 401 });
     }
 
-    // 安全 (Aman): Beri fallback jika JWT_SECRET lupa dipasang di .env
     const secret = process.env.JWT_SECRET || 'fallback_secret_lokal_sementara';
     
     if (!process.env.JWT_SECRET) {

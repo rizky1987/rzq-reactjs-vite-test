@@ -9,6 +9,7 @@ import ProductListView from "./components/ProductListView";
 import ViewProductModal from "./components/View";
 
 import { useProductList } from "./hooks/useProductList";
+import { Product } from "@/app/(admin)/product/types/product.type";
 
 export default function ProductList() {
   const {
@@ -35,15 +36,47 @@ export default function ProductList() {
       msg: string;
     } | null>(null);
 
+  const [processOptionCreateUpdate, setProcessOptionCreateUpdate] = 
+      useState<'create' | 'update'>('create');
+
+  const [processOptionViewDelete, setProcessOptionViewDelete] = 
+   useState<'view' | 'delete'>('view');
+
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const handleSuccess = (
     message: string,
+    alertType: | "success" | "danger" | "warning",
   ) => {
     setAlert({
-      type: "success",
+      type: alertType,
       msg: message,
     });
   };
 
+  const doCreate = () => {
+    setIsCreateOpen(true)
+    setProcessOptionCreateUpdate("create");
+  };
+
+  const doUpdate = (product : Product) => {
+    setIsCreateOpen(true)
+    setSelectedProduct(product);
+    setProcessOptionCreateUpdate("update");
+  };
+
+  const doView = (product : Product) => {
+    setIsViewOpen(true)
+     setSelectedProduct(product);
+    setProcessOptionViewDelete("view");
+  };
+
+  const doDelete = (product : Product) => {
+    setIsViewOpen(true)
+    setSelectedProduct(product);
+    setProcessOptionViewDelete("delete");
+  };
+
+  
   return (
     <>
       {/* Alert */}
@@ -65,8 +98,10 @@ export default function ProductList() {
         onClose={() =>
           setIsCreateOpen(false)
         }
-        process="create"
+        process={processOptionCreateUpdate}
         onSuccess={handleSuccess}
+        product={selectedProduct}
+
       />
 
       <ViewProductModal
@@ -74,25 +109,23 @@ export default function ProductList() {
         onClose={() =>
           setIsViewOpen(false)
         }
-        proccess="view"
-        productId="1"
+        proccess={processOptionViewDelete}
+        product={selectedProduct!}
       />
 
       {/* View */}
       <ProductListView
         products={products}
-        onCreate={() =>
-          setIsCreateOpen(true)
-        }
-        onUpdate={() =>
-          setIsCreateOpen(true)
-        }
-        onView={() =>
-          setIsViewOpen(true)
-        }
-        onDelete={() =>
-          setIsViewOpen(true)
-        }
+        onCreate={doCreate}
+        onUpdate={(product) => {
+          doUpdate(product);
+        }}
+        onView={(product) => {
+          doView(product);
+        }}
+        onDelete={(product) => {
+          doDelete(product);
+        }}
       />
     </>
   );

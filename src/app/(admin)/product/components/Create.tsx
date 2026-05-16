@@ -1,21 +1,33 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Title from '@/components/ui/Title';
+import { Product } from "@/app/(admin)/product/types/product.type";
 
 interface ProductCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   process: 'create' | 'update';
-  onSuccess: (message: string) => void;
+  onSuccess: (message: string, alertType :| "success" | "danger" | "warning") => void;
+    product : Product | null;
 }
 
-const CreateProductModal = ({ isOpen, onClose, onSuccess, process }: ProductCreateModalProps) => {
+const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process, product }: ProductCreateModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!product) {
+      setName("");
+      setDesc("");
+      return;
+    }
+    setName(product.name);
+    setDesc(product.description);
+  }, [product]);
 
   if (!isOpen) return null;
 
@@ -41,10 +53,14 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess, process }: ProductCrea
         resetForm();
         setIsLoading(false);
         onClose();
-        onSuccess(process === 'create' ? "Product Created Successfully!" : "Failed Created Product!");
+        onModalClose(process === 'create' ? "Product Created Successfully!" : "Failed Created Product!","success");
       }, 2000);
     } catch (err) {
       setIsLoading(false);
+      
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      onClose();
+      onModalClose(errorMessage,"danger");
     }
   };
 

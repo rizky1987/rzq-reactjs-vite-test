@@ -8,11 +8,12 @@ interface Props {
 
   onCreate: () => void;
 
-  onUpdate: () => void;
+  onUpdate: (product: Product) => void;
 
-  onView: () => void;
+  onView: (product: Product) => void;
 
-  onDelete: () => void;
+  onDelete: (product: Product) => void;
+
 }
 
 export default function ProductListView({
@@ -39,7 +40,7 @@ export default function ProductListView({
         <Button
           variant="primary"
           buttonType="add"
-          onClick={onCreate}
+          onClick={()=>onCreate()}
         >
           Add Product
         </Button>
@@ -60,19 +61,19 @@ export default function ProductListView({
               <div className="absolute left-3 top-3 z-20 flex gap-2">
                 <ButtonIcon
                   buttonType="view"
-                  onClick={onView}
+                  onClick={()=> onView(product)}
                 />
 
                 <ButtonIcon
                   buttonType="edit"
-                  onClick={onUpdate}
+                  onClick={()=> onUpdate(product)}
                 />
               </div>
 
               <div className="absolute right-3 top-3 z-20">
                 <ButtonIcon
                   buttonType="delete"
-                  onClick={onDelete}
+                 onClick={()=> onDelete(product)}
                 />
               </div>
 

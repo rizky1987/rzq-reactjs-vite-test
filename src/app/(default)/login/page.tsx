@@ -1,9 +1,17 @@
 "use client";
 
-import { useLogin } from "./useLogin"; // Menggunakan custom hook yang sudah kita perbaiki sebelumnya
+import { useLogin } from "./useLogin"; 
+import { signIn } from "next-auth/react"; 
+import { FaGoogle } from "react-icons/fa"; // Memasukkan kembali icon Google biar rapi
 
 export default function LoginPage() {
-  // Ambil state dan fungsi handler yang berasal dari logika Code 1 (via useLogin)
+
+  const handleGoogleLogin = async () => {
+    // Memanggil signIn versi client secara aman tanpa Server Action inline
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
+  // Ambil state dan fungsi handler yang berasal dari logika via useLogin
   const {
     email,
     setEmail,
@@ -19,14 +27,14 @@ export default function LoginPage() {
       {/* Container Grid untuk membagi Form dan Info Card */}
       <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         
-        {/* --- BAGIAN KIRI: FORM LOGIN (Gaya Visual Code 2 + Logika Code 1) --- */}
+        {/* --- BAGIAN KIRI: FORM LOGIN --- */}
         <div className="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 border border-gray-200">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Sign In</h2>
             <p className="text-sm text-gray-500 mt-2">Masuk untuk mengakses sistem terproteksi</p>
           </div>
 
-          {/* Kotak Error dari Code 1 */}
+          {/* Kotak Error */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 mb-6 text-sm rounded-r-lg font-mono">
               ⚠️ {error}
@@ -85,6 +93,26 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* DIVIDER */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-2 text-gray-500">Atau masuk dengan</span>
+            </div>
+          </div>
+
+          {/* OAUTH BUTTON: Bersih tanpa tag form/use server eksternal */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition active:transform active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <FaGoogle className="h-5 w-5 text-red-500" />
+            <span>Sign in with Google</span>
+          </button>
+
           <div className="text-center pt-6 border-t border-gray-100 mt-6">
             <p className="text-xs text-gray-400 font-mono">
               Secured Session via Redis Cache & PostgreSQL
@@ -92,7 +120,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* --- BAGIAN KANAN: INFO CARD (Dipertahankan dari Code 2) --- */}
+        {/* --- BAGIAN KANAN: INFO CARD --- */}
         <div className="hidden lg:block space-y-4">
           <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm font-bold text-gray-600 text-sm">
             <button
@@ -107,7 +135,7 @@ export default function LoginPage() {
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500 rounded-full opacity-50"></div>
             
             <h3 className="text-xl font-bold mb-4 relative z-10 flex items-center gap-2">
-              <i className="fas fa-info-circle"></i> Demo Account Information
+              Demo Account Information
             </h3>
             
             <div className="space-y-4 relative z-10">
@@ -116,7 +144,6 @@ export default function LoginPage() {
                 <p className="font-mono text-sm">email : user@rizky.com</p>
                 <p className="font-mono text-sm">pass  : password123</p>
                 <div className="mt-2 flex items-center gap-2 text-xs text-blue-100">
-                  <i className="fas fa-check-circle text-green-400"></i>
                   Access Scope: Product Only
                 </div>
               </div>
@@ -126,7 +153,6 @@ export default function LoginPage() {
                 <p className="font-mono text-sm">email : admin@rizky.com</p>
                 <p className="font-mono text-sm">pass  : password123</p>
                 <div className="mt-2 flex items-center gap-2 text-xs text-blue-100">
-                  <i className="fas fa-check-circle text-green-400"></i>
                   Access Scope: Dashboard & Product
                 </div>
               </div>
