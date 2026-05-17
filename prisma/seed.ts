@@ -1,4 +1,3 @@
-// 📄 prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg'; 
 import pg from 'pg';                          
@@ -6,7 +5,6 @@ import fs from 'fs';
 import path from 'path';
 import { seedProducts } from './seeds/product.seed';
 import { seedUsers } from './seeds/user.seed';
-import { seedProducts } from './seeds/product.seed';
 
 // 💡 TRICK AMAN: Paksa baca file .env secara manual jika process.env kosong
 if (!process.env.DATABASE_URL) {
