@@ -29,7 +29,7 @@ export function useLogin() {
       }
 
       // Berhasil login, arahkan ke dashboard utama
-      router.push('/dashboard');
+      router.push('/product');
       router.refresh();
     } catch (err: any) {
       setError(err.message);

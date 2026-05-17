@@ -3,12 +3,12 @@
 import { useLogin } from "./useLogin"; 
 import { signIn } from "next-auth/react"; 
 import { FaGoogle } from "react-icons/fa"; // Memasukkan kembali icon Google biar rapi
+import Link from "next/link";
 
 export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
-    // Memanggil signIn versi client secara aman tanpa Server Action inline
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl: "/product" });
   };
 
   // Ambil state dan fungsi handler yang berasal dari logika via useLogin
@@ -122,14 +122,27 @@ export default function LoginPage() {
 
         {/* --- BAGIAN KANAN: INFO CARD --- */}
         <div className="hidden lg:block space-y-4">
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm font-bold text-gray-600 text-sm">
-            <button
-              type="button"
-              className="w-full py-3 rounded-lg text-white font-bold shadow-md transition-all bg-blue-600 hover:bg-blue-700 active:transform active:scale-[0.98]"
-            >
-              Download Curriculum Vitae
-            </button>
-          </div>
+          
+          <div className="bg-white p-2 rounded-2xl border border-gray-200 shadow-sm font-bold text-gray-600 text-sm">
+            <span className="font-bold text-xl tracking-wider block group-[.data-closed]:hidden truncate">
+              <Link
+                key='/profile'
+                href='/profile'
+                className="flex items-center rounded-lg px-6 py-2"
+                title='Profile' // Tetap memunculkan tooltip kecil saat sidebar mengecil
+              >
+                {/* Icon tetep terlihat di tengah saat sidebar mengecil */}
+                  
+                <button
+                  type="button"
+                  className="w-full py-3 rounded-lg text-white font-bold shadow-md transition-all bg-blue-600"
+                >
+                  Download Curriculum Vitae
+                </button>
+              </Link>
+            </span>
+            
+        </div>
 
           <div className="bg-blue-600 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500 rounded-full opacity-50"></div>

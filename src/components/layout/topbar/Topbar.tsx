@@ -1,24 +1,26 @@
 "use client"
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { handleServerLogout } from "@/app/actions/auth";
 
 const Topbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-const handleLogout = async () => {
-  try {
-    // 1. Tembak API logout ke backend
-    await fetch('/api/auth/logout', { method: 'POST' });
-    
-    // Jika perlu membaca response data di masa depan, tinggal uncomment bawah ini:
-    // const data = await res.json();
-    
-  } catch (error) {
-    console.error('Terjadi kesalahan saat logout API:', error);
-  } finally {
-    // 2. Alihkan halaman ke login (taruh di finally agar tetap pindah walau API error)
-    window.location.href = '/login';
-  }
-};
+  const handleLogout = () => {
+    // 1. Tutup dropdown terlebih dahulu agar UI terasa responsif
+    setShowDropdown(false);
+
+    // 2. Jalankan Server Action di dalam transisi aman Next.js
+    startTransition(async () => {
+      try {
+        await handleServerLogout();
+      } catch (error) {
+        console.error("Terjadi kesalahan saat logout:", error);
+        // Pelarian darurat jika komunikasi server benar-benar putus
+        window.location.href = '/login';
+      }
+    });
+  };
 
   return (
     <nav className="sticky top-0 z-30 flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 shadow-sm">
@@ -39,7 +41,7 @@ const handleLogout = async () => {
               className="w-full py-2 pl-4 pr-10 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" 
               placeholder="Search for..." 
             />
-            <button className="absolute inset-y-0 right-0 flex items-center pr-3 group">
+            <button type="button" className="absolute inset-y-0 right-0 flex items-center pr-3 group">
               <i className="fas fa-search text-gray-400 group-hover:text-blue-600"></i>
             </button>
           </div>
@@ -72,8 +74,9 @@ const handleLogout = async () => {
         {/* User Dropdown */}
         <div className="relative">
           <button 
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-all focus:outline-none"
+            onClick={() => !isPending && setShowDropdown(!showDropdown)}
+            disabled={isPending}
+            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-all focus:outline-none disabled:opacity-50"
           >
             <span className="hidden lg:inline text-sm font-medium text-gray-600">
               {/* {userName} */}
@@ -106,12 +109,14 @@ const handleLogout = async () => {
                 
                 <div className="my-1 border-t border-gray-100"></div>
                 
+                {/* 🔥 Tombol Logout Terkunci Aman */}
                 <button 
                   onClick={handleLogout}
-                  className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  disabled={isPending}
+                  className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 font-medium"
                 >
                   <i className="fas fa-sign-out-alt fa-sm fa-fw mr-3"></i>
-                  Logout
+                  {isPending ? "Logging out..." : "Logout"}
                 </button>
               </div>
             </>

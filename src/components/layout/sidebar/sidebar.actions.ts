@@ -7,6 +7,7 @@ export interface MenuItem {
     | "SUPERADMIN"
     | "ADMIN"
     | "USER"
+    | "ANONIM" // 💡 Tambahkan ANONIM ke dalam daftar tipe data roles opsional
   )[];
 }
 
@@ -19,22 +20,21 @@ export interface MenuItem {
 export const menus: MenuItem[] = [
   /*
   |--------------------------------------------------------------------------
-  | PUBLIC
+  | PUBLIC / UNAUTHENTICATED ONLY
   |--------------------------------------------------------------------------
   */
-
-  // {
-  //   title: "Profile",
-  //   href: "/profile",
-  //   icon: "fas fa-user",
-  // },
+  {
+    title: "Login",
+    href: "/login",
+    icon: "fas fa-sign-in-alt",
+    roles: ["ANONIM"], // 💡 Menu ini dikunci khusus untuk user tanpa role / ANONIM
+  },
 
   /*
   |--------------------------------------------------------------------------
   | ADMIN ONLY
   |--------------------------------------------------------------------------
   */
-
   {
     title: "Dashboard",
     href: "/dashboard",
@@ -47,7 +47,6 @@ export const menus: MenuItem[] = [
   | ADMIN & USER
   |--------------------------------------------------------------------------
   */
-
   {
     title: "Product",
     href: "/product",
@@ -63,13 +62,17 @@ export const menus: MenuItem[] = [
 */
 
 export function filterMenusByRole(
-  role?: "SUPERADMIN" | "ADMIN" | "USER" | string, // Izinkan menerima string biasa agar fleksibel
+  role?: "SUPERADMIN" | "ADMIN" | "USER" | "ANONIM" | string,
 ) {
+  // 💡 1. Jika role kosong, null, undefined, atau string kosong, otomatis paksa statusnya jadi "ANONIM"
+  const currentRole = (!role || role.trim() === "") ? "ANONIM" : role.toUpperCase();
+
   return menus.filter((menu) => {
     /*
     |--------------------------------------------------------------------------
-    | PUBLIC MENU
+    | PUBLIC MENU (Bisa diakses siapa saja, baik terautentikasi maupun tidak)
     |--------------------------------------------------------------------------
+    | Contoh: Jika nanti kamu mengaktifkan menu "Profile" tanpa properti `.roles`
     */
     if (!menu.roles) {
       return true;
@@ -77,21 +80,10 @@ export function filterMenusByRole(
 
     /*
     |--------------------------------------------------------------------------
-    | NO ROLE
+    | ROLE CHECK
     |--------------------------------------------------------------------------
     */
-    if (!role) {
-      return false;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ROLE CHECK (KINI AMAN DARI CASE-SENSITIVE)
-    |--------------------------------------------------------------------------
-    */
-    // 💡 Paksa string role dari Redis/Database menjadi UPPERCASE sebelum dicek
-    const upperCaseRole = role.toUpperCase();
-
-    return menu.roles.includes(upperCaseRole as any);
+    // Cek apakah kecocokan role (termasuk kondisi ANONIM) ada di dalam array menu
+    return menu.roles.includes(currentRole as any);
   });
 }

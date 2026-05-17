@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { filterMenusByRole } from "./sidebar.actions";
 import { redis } from "@/lib/redis";
-import SidebarWrapper from "./SidebarWrapper"; // 💡 Import wrapper baru
+import SidebarWrapper from "./SidebarWrapper";
 
 export default async function Sidebar() {
   const cookieStore = await cookies();
@@ -21,8 +21,6 @@ export default async function Sidebar() {
       console.error("Gagal mengambil data sesi dari Redis:", error);
     }
   }
-
-  console.log("=== FINAL ROLE FOR FILTER ===", currentRole);
   const menus = filterMenusByRole(currentRole);
 
   return (
@@ -40,7 +38,7 @@ export default async function Sidebar() {
             <i className="fas fa-user w-5 text-center text-lg" />
             
             {/* Teks menu otomatis hilang dengan efek opacity jika dibungkus CSS flex group */}
-            <span className="ml-4 transition-opacity duration-200 block [.data-closed_&]:opacity-0 [.data-closed_&]:w-0 truncate">
+            <span className="ml-1 transition-opacity duration-200 block [.data-closed_&]:opacity-0 [.data-closed_&]:w-0">
               Curriculum Vitae
             </span>
           </Link>
