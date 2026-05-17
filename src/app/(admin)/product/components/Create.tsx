@@ -1,3 +1,4 @@
+// 📄 src/components/modals/CreateProductModal.tsx (atau sesuaikan dengan jalur folder Anda)
 import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Title from '@/components/ui/Title';
@@ -7,8 +8,8 @@ interface ProductCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   process: 'create' | 'update';
-  onSuccess: (message: string, alertType :| "success" | "danger" | "warning") => void;
-    product : Product | null;
+  onSuccess: (message: string, alertType: "success" | "danger" | "warning") => void;
+  product: Product | null;
 }
 
 const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process, product }: ProductCreateModalProps) => {
@@ -19,51 +20,97 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Synchronize state ketika modal dibuka atau mendeteksi perubahan data produk (saat edit)
   useEffect(() => {
-    if (!product) {
-      setName("");
-      setDesc("");
-      return;
+    if (isOpen) {
+      if (product && process === 'update') {
+        setName(product.name);
+        setDesc(product.description || "");
+      } else {
+        resetForm();
+      }
     }
-    setName(product.name);
-    setDesc(product.description);
-  }, [product]);
+  }, [product, process, isOpen]);
 
   if (!isOpen) return null;
 
+  // Validasi Input di Sisi Client
   const validate = () => {
     const newErrors: any = {};
     if (!name.trim()) newErrors.name = "Product name is required";
     if (!desc.trim()) newErrors.desc = "Description is required";
-    if (!image && process === 'create') newErrors.image = "Product image is required";
+    
+    // Gambar hanya wajib diisi saat membuat produk baru, jika update boleh dikosongkan (keep existing)
+    if (!image && process === 'create') {
+      newErrors.image = "Product image is required";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handler Submit Form ke Database via API Route
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     
     setIsLoading(true);
     
-    // Simulasi API Call
     try {
-      setTimeout(() => {
-        resetForm();
-        setIsLoading(false);
-        onClose();
-        onModalClose(process === 'create' ? "Product Created Successfully!" : "Failed Created Product!","success");
-      }, 2000);
+      let response;
+      
+      if (process === 'create') {
+        // 🚀 REQUEST POST: Tambah Produk Baru
+        response = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            name: name.trim(), 
+            description: desc.trim() 
+          }),
+        });
+      } else {
+        // 🚀 REQUEST PUT: Perbarui Produk Berdasarkan ID (UUID)
+        response = await fetch("/api/products", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            id: product?.id, 
+            name: name.trim(), 
+            description: desc.trim() 
+          }),
+        });
+      }
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Something went wrong on the server");
+      }
+      
+      // Jika Berhasil:
+      resetForm();
+      setIsLoading(false);
+      onClose(); // Tutup Modal
+      
+      // Picu trigger alert sukses di halaman utama
+      onModalClose(
+        process === 'create' 
+          ? "Product Created Successfully!" 
+          : "Product Updated Successfully!",
+        "success"
+      );
+
     } catch (err) {
       setIsLoading(false);
-      
       const errorMessage = err instanceof Error ? err.message : String(err);
-      onClose();
-      onModalClose(errorMessage,"danger");
+      
+      // Jangan langsung tutup modal jika gagal, agar user bisa melihat letak kesalahannya
+      onModalClose(errorMessage, "danger");
     }
   };
 
+  // Fungsi Pembersih Form
   const resetForm = () => {
     setName('');
     setDesc('');
@@ -89,7 +136,7 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
             <div className="relative flex items-center justify-center">
               <div className="h-16 w-16 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
             </div>
-            <p className="mt-4 text-sm font-bold text-slate-700 tracking-wide uppercase">Processing...</p>
+            <p className="mt-4 text-sm font-bold text-slate-700 tracking-wide uppercase">Processing to Database...</p>
           </div>
         )}
 
@@ -112,7 +159,8 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
                 className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg transition-all focus:ring-2 focus:ring-blue-500/20 focus:outline-none ${
                   errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-blue-500'
                 }`}
-                placeholder="e.g. Mechanical Keyboard"
+                placeholder="e.g. Mountain Gear Pack"
+                disabled={isLoading}
               />
               {errors.name && <p className="text-red-500 text-[10px] font-bold uppercase mt-1">{errors.name}</p>}
             </div>
@@ -128,6 +176,7 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
                 }`}
                 rows={3}
                 placeholder="Describe your product..."
+                disabled={isLoading}
               />
               {errors.desc && <p className="text-red-500 text-[10px] font-bold uppercase mt-1">{errors.desc}</p>}
             </div>
@@ -144,6 +193,7 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
                   onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
                   accept="image/*"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={isLoading}
                 />
                 <div className="text-center">
                   <div className="text-gray-400 mb-1 text-sm italic">
@@ -152,6 +202,9 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
                   <p className="text-[10px] text-gray-400">PNG, JPG up to 2MB</p>
                 </div>
               </div>
+              {process === 'update' && !image && (
+                <p className="text-gray-400 text-[10px] italic mt-1">*Leave empty to keep current image</p>
+              )}
               {errors.image && <p className="text-red-500 text-[10px] font-bold uppercase mt-1">{errors.image}</p>}
             </div>
 
@@ -161,12 +214,14 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
                 variant="secondary"
                 buttonType="cancel"
                 onClick={onClose}
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button 
                 variant="primary"
                 buttonType="submit"
+                disabled={isLoading}
               >
                 {process === 'create' ? 'Create Product' : 'Save Changes'}
               </Button>

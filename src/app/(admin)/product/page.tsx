@@ -12,8 +12,10 @@ import { useProductList } from "./hooks/useProductList";
 import { Product } from "@/app/(admin)/product/types/product.type";
 
 export default function ProductList() {
+  // 💡 Ambil fungsi refreshProducts dari custom hook kamu
   const {
     products,
+    refreshProducts,
   } = useProductList();
 
   const [
@@ -32,7 +34,6 @@ export default function ProductList() {
         | "success"
         | "danger"
         | "warning";
-
       msg: string;
     } | null>(null);
 
@@ -43,40 +44,46 @@ export default function ProductList() {
    useState<'view' | 'delete'>('view');
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const handleSuccess = (
     message: string,
-    alertType: | "success" | "danger" | "warning",
+    alertType: "success" | "danger" | "warning",
   ) => {
     setAlert({
       type: alertType,
       msg: message,
     });
+
+    // 💡 JIKA BERHASIL CREATE/UPDATE, LANGSUNG REFRESH DATA DARI DATABASE
+    if (alertType === "success") {
+      refreshProducts();
+    }
   };
 
   const doCreate = () => {
-    setIsCreateOpen(true)
+    setSelectedProduct(null); // Bersihkan sisa data edit sebelumnya agar form kosong
+    setIsCreateOpen(true);
     setProcessOptionCreateUpdate("create");
   };
 
   const doUpdate = (product : Product) => {
-    setIsCreateOpen(true)
     setSelectedProduct(product);
+    setIsCreateOpen(true);
     setProcessOptionCreateUpdate("update");
   };
 
   const doView = (product : Product) => {
-    setIsViewOpen(true)
-     setSelectedProduct(product);
+    setSelectedProduct(product);
+    setIsViewOpen(true);
     setProcessOptionViewDelete("view");
   };
 
   const doDelete = (product : Product) => {
-    setIsViewOpen(true)
     setSelectedProduct(product);
+    setIsViewOpen(true);
     setProcessOptionViewDelete("delete");
   };
 
-  
   return (
     <>
       {/* Alert */}
@@ -101,7 +108,6 @@ export default function ProductList() {
         process={processOptionCreateUpdate}
         onSuccess={handleSuccess}
         product={selectedProduct}
-
       />
 
       <ViewProductModal
@@ -110,7 +116,8 @@ export default function ProductList() {
           setIsViewOpen(false)
         }
         proccess={processOptionViewDelete}
-        product={selectedProduct!}
+        product={selectedProduct}
+        onSuccess={handleSuccess}
       />
 
       {/* View */}
