@@ -7,23 +7,32 @@ import path from 'path';
 // Pastikan env termuat di runtime
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+// 💡 Definisikan tipe global secara eksplisit sesuai standar Prisma 7
+const globalForPrisma = globalThis as unknown as {
+  prismaGlobal: PrismaClient | undefined;
+};
 
-let prismaInstance: PrismaClient;
+const createPrismaClient = () => {
+  const connectionString = process.env.DATABASE_URL;
+  
+  if (!connectionString) {
+    throw new Error("❌ DATABASE_URL tidak ditemukan di environment variables!");
+  }
 
-if (globalForPrisma.prisma) {
-  prismaInstance = globalForPrisma.prisma;
-} else {
   // 1. Buat koneksi pool menggunakan driver murni 'pg'
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString });
   
   // 2. Bungkus ke dalam Driver Adapter resmi Prisma 7
   const adapter = new PrismaPg(pool);
   
   // 3. Masukkan adapter ke dalam constructor utama
-  prismaInstance = new PrismaClient({ adapter });
+  return new PrismaClient({ adapter });
+};
+
+const prisma = globalForPrisma.prismaGlobal ?? createPrismaClient();
+
+export default prisma; // 🔥 Tambahkan kata 'default' di sini!
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prismaGlobal = prisma;
 }
-
-export const prisma = prismaInstance;
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

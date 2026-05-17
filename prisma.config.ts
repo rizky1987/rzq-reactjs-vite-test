@@ -1,15 +1,19 @@
-import { defineConfig } from '@prisma/config';
-import * as dotenv from 'dotenv';
+// 📄 prisma.config.ts
+import dotenv from 'dotenv';
 import path from 'path';
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+import { defineConfig, env } from 'prisma/config';
 
 export default defineConfig({
+  schema: 'prisma/schema', 
+  
   datasource: {
-    url: process.env.DATABASE_URL,
+    url: env('DATABASE_URL'),
   },
-  // 💡 Konfigurasi yang benar untuk Prisma 7++ ada di sini
+  
   migrations: {
-    seed: 'tsx ./prisma/seed.ts',
+    path: 'prisma/migrations',
+    seed: 'tsx prisma/seed.ts',
   },
 });

@@ -1,35 +1,37 @@
-"use client";
-
+// 📄 src/app/(admin)/product/hooks/useProductList.ts
 import { useEffect, useState } from "react";
-
-import { getProducts } from "../actions/product.actions";
-
 import { Product } from "../types/product.type";
 
-export function useProductList() {
-  const [products, setProducts] =
-    useState<Product[]>([]);
+// ❌ HAPUS IMPORT YANG MERUSAK BROWSER INI:
+// import { getProducts } from "../services/product.services";
 
-  const [loading, setLoading] =
-    useState(true);
+export function useProductList() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function loadProducts() {
       try {
-        const response =
-          await getProducts();
-
-        setProducts(response);
+        setLoading(true);
+        // ✅ GANTI DENGAN CALL API: Panggil API Route internal kita yang aman
+        const response = await fetch("/api/products");
+        
+        if (!response.ok) {
+          throw new Error("Gagal mengambil data dari server");
+        }
+        
+        const data = await response.json();
+        setProducts(data);
+      } catch (err: any) {
+        setError(err.message || "Terjadi kesalahan");
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  return {
-    products,
-    loading,
-  };
+  return { products, loading, error };
 }

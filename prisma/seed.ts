@@ -1,69 +1,62 @@
+// 📄 prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import bcrypt from 'bcrypt';
-import * as dotenv from 'dotenv';
+import { PrismaPg } from '@prisma/adapter-pg'; 
+import pg from 'pg';                          
+import fs from 'fs';
 import path from 'path';
+import { seedProducts } from './seeds/product.seed';
+import { seedUsers } from './seeds/user.seed';
+import { seedProducts } from './seeds/product.seed';
 
-// Pastikan file .env dibaca dengan benar
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+// 💡 TRICK AMAN: Paksa baca file .env secara manual jika process.env kosong
+if (!process.env.DATABASE_URL) {
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const envConfig = fs.readFileSync(envPath, 'utf-8');
+      envConfig.split('\n').forEach((line) => {
+        const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+        if (match) {
+          const key = match[1];
+          let value = match[2] || '';
+          // Hapus tanda kutip jika ada
+          if (value.length > 0 && value.startsWith('"') && value.endsWith('"')) {
+            value = value.substring(1, value.length - 1);
+          }
+          process.env[key] = value.trim();
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Gagal membaca file .env secara manual:', err);
+  }
+}
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Periksa ulang apakah DATABASE_URL sudah terisi sekarang
+if (!process.env.DATABASE_URL) {
+  console.error("❌ ERROR: DATABASE_URL tidak ditemukan di environment!");
+  process.exit(1);
+}
+
+// Buat pool koneksi dengan jaminan DATABASE_URL berupa string aman
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Memulai proses seeding database...');
-
-  // 1. Generate password yang aman menggunakan bcrypt
-  const hashedPassword = await bcrypt.hash('password123', 10);
-
-  // 2. Gunakan upsert agar data tidak duplikat jika script dijalankan berulang kali
-  const superadmin = await prisma.user.upsert({
-    where: { email: 'superadmin@company.com' },
-    update: {},
-    create: {
-      email: 'superadmin@rizky.com',
-      name: 'Rizky Super Admin',
-      password: hashedPassword,
-      role: 'SUPERADMIN',
-    },
-  });
-
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@rizky.com' },
-    update: {},
-    create: {
-      email: 'admin@rizky.com',
-      name: 'Admin Operational',
-      password: hashedPassword,
-      role: 'ADMIN',
-    },
-  });
-
-  const user = await prisma.user.upsert({
-    where: { email: 'user@rizky.com' },
-    update: {},
-    create: {
-      email: 'user@rizky.com',
-      name: 'Regular User',
-      password: hashedPassword,
-      role: 'USER',
-    },
-  });
-
-  console.log('✅ Seeding berhasil diselesaikan!');
-  console.log({ superadmin: superadmin.email, admin: admin.email, user: user.email });
+  console.log('🌱 Start database seeding...');
+  await seedUsers(prisma);
+  await seedProducts(prisma);
+  // await seedProducts(prisma); // Aktifkan jika file product seed kamu sudah siap
+  console.log('\n🏁 All database seeds completed successfully!');
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-    await pool.end();
-  })
-  .catch(async (e) => {
-    console.error('❌ Terjadi kesalahan saat seeding:', e);
-    await prisma.$disconnect();
-    await pool.end();
+  .catch((e) => {
+    console.error('❌ Database seeding failed:', e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end(); 
   });
