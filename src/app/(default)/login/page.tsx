@@ -107,11 +107,6 @@ export default function LoginPage() {
             <span>Sign in with Google</span>
           </button>
 
-          <div className="text-center pt-6 border-t border-gray-100 mt-6">
-            <p className="text-xs text-gray-400 font-mono">
-              Secured Session via Redis Cache & PostgreSQL
-            </p>
-          </div>
         </div>
 
         <div className="hidden lg:block space-y-4">
@@ -130,6 +125,23 @@ export default function LoginPage() {
                   className="w-full py-3 rounded-lg text-white font-bold shadow-md transition-all bg-blue-600"
                 >
                   Download Curriculum Vitae
+                </button>
+              </Link>
+            </span>
+
+            <span className="font-bold text-xl tracking-wider block group-[.data-closed]:hidden truncate">
+              <Link
+                key='/profile'
+                href='/docs'
+                className="flex items-center rounded-lg px-6 py-2"
+                title='Profile' 
+              >
+                  
+                <button
+                  type="button"
+                  className="w-full py-3 rounded-lg text-white font-bold shadow-md transition-all bg-blue-600"
+                >
+                  Technical Specifications
                 </button>
               </Link>
             </span>

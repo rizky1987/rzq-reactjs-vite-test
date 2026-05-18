@@ -1,39 +1,19 @@
-// 📄 src/app/profile/page.tsx
 "use client";
 
-import { useState, useRef } from 'react';
 import ProfileExperince from './profileExperience';
 import ProfilePortfolio from './profilePortfolio';
 import Button from '@/components/ui/Button';
-import { generateCvPdf } from '@/utils/pdfGenerator';
+import { useProfile } from './hooks/useProfile'; 
 
 const Profile = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false); // 🔥 State pendeteksi proses download
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const handleDownloadPdf = async () => {
-    const element = printRef.current;
-    if (!element) return;
-    
-    setIsLoading(true);
-    setIsPrinting(true); // 1. Ubah layout CV ke mode cetak desktop sebentar
-    
-    // Berikan jeda 100ms agar browser selesai mengganti kelas style menjadi mode cetak sebelum dipotret
-    setTimeout(async () => {
-      try {
-        await generateCvPdf({
-          element: element,
-          fileName: 'CV-Rizky-Mochammad-Soleh.pdf'
-        });
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-      } finally {
-        setIsLoading(false);
-        setIsPrinting(false); // 2. Kembalikan layout CV menjadi fit responsif di layar web
-      }
-    }, 100);
-  };
+  const { 
+    isLoading, 
+    isPrinting, 
+    printRef, 
+    handleDownloadPdf, 
+    socialLinks, 
+    skills 
+  } = useProfile();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-2 md:p-4 font-sans relative w-full overflow-x-hidden">
@@ -46,7 +26,6 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Kontainer Utama Wrapper (Mengikuti sisa space layar setelah dikurangi sidebar admin kamu) */}
       <div className="min-h-screen bg-gray-100 p-2 md:p-6 flex flex-col items-center w-full max-w-full">
         
         {/* Tombol Unduh */}
@@ -61,29 +40,25 @@ const Profile = () => {
           </Button>
         </div>
 
-        {/* 💡 SOLUSI UTAMA: Jika sedang didownload kancing di 1024px, jika di web biasa buat w-full max-w-5xl (Fit Layar) */}
+        {/* Kontainer Utama CV */}
         <div 
           ref={printRef} 
           className={`bg-white shadow-2xl flex flex-col md:flex-row overflow-hidden min-h-screen transition-all duration-100
             ${isPrinting 
-              ? 'w-[1024px] min-w-[1024px]' // Mode potret PDF (Kunci lebar agar presisi)
-              : 'w-full max-w-5xl'          // Mode Web normal (Otomatis fit mengikuti sisa layar monitor)
+              ? 'w-[1024px] min-w-[1024px]' 
+              : 'w-full max-w-5xl'          
             }`}
         >
           {/* SIDEBAR CV */}
           <aside className="w-full md:w-80 bg-slate-800 text-white p-6 md:p-8 flex flex-col items-center shrink-0">
             <div className="relative mb-6 flex justify-center w-full">
-            {/* Pembungkus berbentuk lingkaran yang memotong gambar secara konvensional */}
-            <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border-4 border-slate-700 shadow-xl overflow-hidden bg-slate-700 shrink-0">
+              <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border-4 border-slate-700 shadow-xl overflow-hidden bg-slate-700 shrink-0">
                 <img 
-                src="/icons/photo.jpeg" 
-                alt="Profile" 
-                className="w-full h-full object-cover object-center scale-105" 
-                /* 💡 Catatan: object-center sangat stabil dibaca oleh html2canvas. 
-                    Jika posisi wajah dirasa terlalu turun, kamu bisa menambahkan class 'scale-105' atau 'scale-110' 
-                    untuk memperbesar sedikit, sehingga posisi rambut aman dari potongan tepi atas. */
+                  src="/icons/photo.jpeg" 
+                  alt="Profile" 
+                  className="w-full h-full object-cover object-center scale-105" 
                 />
-            </div>
+              </div>
             </div>
             
             <div className="text-center w-full">
@@ -108,7 +83,7 @@ const Profile = () => {
               <div className="space-y-4">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-blue-400">Skills</h3>
                 <ul className="grid grid-cols-2 md:grid-cols-1 gap-2 text-xs">
-                  {['Go-lang', 'C# .Net', 'Native PHP', 'React', 'AWS / Azure', 'Kubernetes', 'MongoDB', 'MsSQL'].map((skill) => (
+                  {skills.map((skill) => (
                     <li key={skill} className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
                       {skill}
@@ -135,12 +110,7 @@ const Profile = () => {
             <section className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100 w-full">
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 text-center">Find me on</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {[
-                  { icon: '/icons/linkedin.png', label: 'LinkedIn', link: 'rizky-mochammad-soleh' },
-                  { icon: '/icons/github.png', label: 'GitHub', link: 'rizky1987' },
-                  { icon: '/icons/gmail.png', label: 'Email', link: 'rizky.msoleh@gmail.com' },
-                  { icon: '/icons/wa.png', label: 'WhatsApp', link: '+62 857 2251 7987' }
-                ].map((social) => (
+                {socialLinks.map((social) => (
                   <a key={social.label} href="#" className="flex items-center gap-3 hover:text-blue-600 transition-colors group">
                     <img className="w-5 h-5 grayscale group-hover:grayscale-0 transition-all" src={social.icon} alt={social.label} />
                     <span className="text-[10px] md:text-[11px] text-gray-600 truncate">{social.link}</span>
@@ -150,7 +120,7 @@ const Profile = () => {
             </section>
 
             {/* Portfolio Component */}
-            <div className="w-full mb-6">
+            <div className="w-full mb-3">
               <ProfilePortfolio />
             </div>
             

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-// Kita pakai library inti Chart.js langsung untuk kestabilan maksimal
 import {
   Chart,
   CategoryScale,
@@ -32,7 +31,6 @@ const BarChart = ({ variant = 'primary', title, labels, data, className, ...prop
   };
 
   useEffect(() => {
-    // 1. Registrasi tepat di dalam useEffect untuk memastikan window/browser sudah siap
     Chart.register(
       CategoryScale,
       LinearScale,
@@ -47,12 +45,10 @@ const BarChart = ({ variant = 'primary', title, labels, data, className, ...prop
       const ctx = canvasRef.current.getContext('2d');
       
       if (ctx) {
-        // 2. Hancurkan chart lama jika ada sebelum membuat yang baru (mencegah duplikasi)
         if (chartRef.current) {
           chartRef.current.destroy();
         }
 
-        // 3. Inisialisasi Chart baru
         chartRef.current = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -72,7 +68,7 @@ const BarChart = ({ variant = 'primary', title, labels, data, className, ...prop
             },
             scales: {
               x: { 
-                type: 'category', // Ini kuncinya agar tidak eror "category scale"
+                type: 'category', 
                 grid: { display: false } 
               },
               y: { 
@@ -85,13 +81,12 @@ const BarChart = ({ variant = 'primary', title, labels, data, className, ...prop
       }
     }
 
-    // Cleanup saat komponen dicopot (unmount)
     return () => {
       if (chartRef.current) {
         chartRef.current.destroy();
       }
     };
-  }, [labels, data, variant, title]); // Re-render jika data berubah
+  }, [labels, data, variant, title]); 
 
   return (
     <div 

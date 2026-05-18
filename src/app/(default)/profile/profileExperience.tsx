@@ -47,7 +47,11 @@ const ProfileExperience = () => {
         "Go-lang (fiber, echo)",
         "AWS","Azure",
         "Mysql","Postgres",
-        "Docker","CI/CD","Kubernetes"
+        "Docker","CI/CD","Kubernetes",
+        'React.js + Vite', 
+        'TypeScript', 
+        'TailwindCSS', 
+        'Next.js', 
       ]
     },
     {
@@ -166,7 +170,7 @@ const ProfileExperience = () => {
     <section className="w-full">
 
       <div className="space-y-8">
-        <div className="flex items-center gap-3 mt-6">
+        <div className="flex items-center gap-3 mt-2">
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-800">Experience</h3>
           <div className="flex-1 h-px bg-gray-200"></div>
         </div>

@@ -25,7 +25,7 @@ export function useLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Terjadi kesalahan saat login');
+        throw new Error(data.error || 'Something wrong on doing login');
       }
 
       router.push('/product');

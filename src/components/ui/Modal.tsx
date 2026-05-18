@@ -13,19 +13,13 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    // Container Utama: Menggunakan p-2 agar modal hampir menyentuh pinggir di HP kecil
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-2 sm:p-4">
       
-      {/* Backdrop: Overlay hitam transparan */}
       <div 
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
         onClick={onClose} 
       />
 
-      {/* Modal Content Card
-          - items-end & rounded-t-xl di mobile (seperti bottom sheet)
-          - items-center & rounded-lg di desktop
-      */}
       <div className="relative w-full max-w-lg transform overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white p-5 sm:p-8 shadow-2xl transition-all animate-in fade-in zoom-in duration-200">
         
         {/* Header Section */}
@@ -41,15 +35,10 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
           </button>
         </div>
         
-        {/* Body Section: Ukuran teks menyesuaikan layar */}
         <div className="text-sm sm:text-base leading-relaxed text-gray-600 max-h-[60vh] overflow-y-auto">
           {children}
         </div>
 
-        {/* Action Section: 
-            - flex-col-reverse: Di mobile tombol Cancel di bawah Confirm (mudah ditekan)
-            - sm:flex-row: Di desktop kembali sejajar sampingan
-        */}
         <div className="mt-8 flex flex-col-reverse sm:flex-row justify-end gap-3">
           <Button 
             variant="danger" 

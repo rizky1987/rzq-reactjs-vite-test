@@ -11,7 +11,7 @@ const ProfilePortfolio = () => {
 
   return (
     <section className="mt-10">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-3">
         <h3 className="text-sm font-bold uppercase tracking-widest text-slate-800">Featured Projects</h3>
         <div className="flex-1 h-px bg-gray-200"></div>
       </div>
@@ -21,7 +21,6 @@ const ProfilePortfolio = () => {
           <div key={index} className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-md transition-all hover:border-blue-100">
             <div className="flex flex-col gap-3">
               
-              {/* Judul & Badge Tech */}
               <div className="flex flex-col gap-1">
                 <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                   {project.title}
@@ -35,12 +34,10 @@ const ProfilePortfolio = () => {
                 </div>
               </div>
 
-              {/* Deskripsi */}
               <p className="text-[11px] text-gray-600 leading-relaxed text-justify">
                 {project.description}
               </p>
 
-              {/* AREA LINK: Penempatan URL utuh agar Auto-Detect di PDF */}
               <div className="flex flex-col gap-1.5 mt-1 border-t border-gray-50 pt-1">
                 {project.repoLink && (
                   <div className="flex items-center gap-2">

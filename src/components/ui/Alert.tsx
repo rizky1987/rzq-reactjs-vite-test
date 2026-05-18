@@ -20,7 +20,6 @@ const Alert = ({ type, message, duration = 3000, onClose }: AlertProps) => {
     warning: '⚠️',
   };
 
-  // Logika Timeout
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose(); 

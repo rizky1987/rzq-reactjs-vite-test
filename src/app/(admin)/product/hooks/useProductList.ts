@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Product } from "../types/product.type";
 
 export function useProductList() {
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

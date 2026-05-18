@@ -85,7 +85,6 @@ export default function ProductList() {
 
   return (
     <>
-      {/* Alert */}
       {alert && (
         <div className="fixed right-5 top-20 z-50">
           <Alert

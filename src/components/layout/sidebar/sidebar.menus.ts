@@ -5,13 +5,13 @@ export const ALL_MENUS: MenuItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: "fas fa-tachometer-alt",
-    roles: [ROLES.ADMIN, ROLES.USER],
+    roles: [ROLES.ADMIN],
   },
   {
     title: "Product Management",
     href: "/product",
     icon: "fas fa-box",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.USER],
   },
   {
     title: "Login",

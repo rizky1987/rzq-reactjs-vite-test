@@ -3,7 +3,7 @@ interface SummaryCardProps {
   title: string;
   summary: string;
   description: string;
-  icon?: React.ReactNode; // Tambahan untuk icon agar lebih visual
+  icon?: React.ReactNode;
 }
 
 const SummaryCard = ({ 

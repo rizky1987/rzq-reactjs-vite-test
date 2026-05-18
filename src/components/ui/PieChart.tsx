@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-// Kita pakai library inti Chart.js langsung untuk kestabilan maksimal
 import {
   Chart,
   ArcElement,
-  PieController, // Wajib ada untuk render manual Pie Chart
+  PieController,
   Tooltip,
   Legend,
   Title
@@ -29,7 +28,6 @@ const PieChart = ({ title, labels, data, className, ...props }: PieChartProps) =
   ];
 
   useEffect(() => {
-    // 1. Registrasi modul inti khusus Pie Chart di sisi klien
     Chart.register(
       ArcElement,
       PieController,
@@ -42,12 +40,10 @@ const PieChart = ({ title, labels, data, className, ...props }: PieChartProps) =
       const ctx = canvasRef.current.getContext('2d');
 
       if (ctx) {
-        // 2. Hancurkan instance grafik lama jika ada sebelum re-render
         if (chartRef.current) {
           chartRef.current.destroy();
         }
 
-        // 3. Inisialisasi Pie Chart baru secara manual
         chartRef.current = new Chart(ctx, {
           type: 'pie',
           data: {
@@ -85,14 +81,12 @@ const PieChart = ({ title, labels, data, className, ...props }: PieChartProps) =
       }
     }
 
-    // Cleanup saat komponen dicopot (unmount)
     return () => {
       if (chartRef.current) {
         chartRef.current.destroy();
       }
     };
-  }, [labels, data, title]); // Grafik akan di-update otomatis jika props berubah
-
+  }, [labels, data, title]); 
   return (
     <div 
       className={`bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full ${className || ''}`}

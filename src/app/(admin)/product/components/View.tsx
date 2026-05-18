@@ -1,58 +1,29 @@
-import React, { useState } from 'react';
+"use client";
+
+import React from 'react';
 import Title from '@/components/ui/Title';
 import Button from '@/components/ui/Button';
 import { Product } from "@/app/(admin)/product/types/product.type";
+import { useViewProductModal } from '../hooks/useViewProductModal'; // 💡 Impor Custom Hook
 
 interface ProductViewModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null; 
   proccess: 'view' | 'delete';
-  // 💡 Tambahkan prop ini untuk mengirim status sukses ke komponen induk
   onSuccess: (message: string, alertType: "success" | "danger" | "warning") => void; 
 }
 
-const ViewProductModal = ({ isOpen, onClose, proccess, product, onSuccess: onModalClose }: ProductViewModalProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+const ViewProductModal = ({ isOpen, onClose, proccess, product, onSuccess }: ProductViewModalProps) => {
+  const { isLoading, handleDelete } = useViewProductModal({ product, onClose, onSuccess });
 
   if (!isOpen || !product) return null;
-
-const handleDelete = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/products?id=${product.id}`, {
-        method: "DELETE",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Gagal menghapus data dari server");
-      }
-
-      setIsLoading(false);
-      onClose();
-      
-      if (typeof onModalClose === "function") {
-        onModalClose("Product Deleted Successfully!", "success");
-      }
-
-    } catch (err) {
-      setIsLoading(false);
-      const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
-      
-      if (typeof onModalClose === "function") {
-        onModalClose(errorMessage, "danger");
-      } else {
-        alert(errorMessage); 
-      }
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="relative bg-white p-3 rounded-xl shadow-xl w-full max-w-md flex flex-col overflow-hidden max-h-[90vh]">
         
+        {/* Loading Overlay */}
         {isLoading && (
           <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-white/95 backdrop-blur-[1px]">
             <div className="h-12 w-12 rounded-full border-4 border-red-100 border-t-red-600 animate-spin"></div>
@@ -60,6 +31,7 @@ const handleDelete = async () => {
           </div>
         )}
 
+        {/* Header Danger Title */}
         {proccess === 'delete' && (
           <div className="p-3 pb-0">
             <Title 
@@ -69,8 +41,8 @@ const handleDelete = async () => {
           </div>
         )}
 
+        {/* Content Area */}
         <div className="overflow-y-auto p-4 space-y-4">
-          
           <div className="relative">
             <img 
               className="rounded-lg w-full bg-gray-100" 
@@ -92,6 +64,7 @@ const handleDelete = async () => {
           </div>
         </div>
 
+        {/* Action Buttons Footer */}
         <div className="p-3 bg-gray-50 border-t border-gray-100 flex justify-end space-x-2">
           <Button 
             variant="secondary"

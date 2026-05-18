@@ -44,8 +44,6 @@ export function useDashboard() {
     data: [40, 30, 35]
   };
 
-  // Di sini kamu bisa menambahkan fungsi fetch API, state filter, dll. di masa depan
-
   return {
     transactionColumns,
     transactionData,

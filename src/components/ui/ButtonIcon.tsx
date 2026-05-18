@@ -5,7 +5,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const ButtonIcon = ({ buttonType = 'view', ...props }: ButtonProps) => {
-  // Definisi Ikon dan Warna berdasarkan ButtonType
   const config = {
     view: {
       icon: 'fa-eye',
