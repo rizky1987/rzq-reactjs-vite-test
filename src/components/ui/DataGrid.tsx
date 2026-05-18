@@ -9,8 +9,7 @@ interface DataGridProps {
 const DataGrid = ({ title, columns, data }: DataGridProps) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header Tabel - Responsive Flex */}
-      <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
           <h3 className="font-bold text-gray-800 text-lg tracking-tight">{title}</h3>
           <p className="text-xs text-gray-400 mt-0.5">Manage and monitor your data entries</p>
@@ -20,7 +19,6 @@ const DataGrid = ({ title, columns, data }: DataGridProps) => {
         </span>
       </div>
 
-      {/* Wrapper untuk Responsive Scroll dengan Custom Scrollbar */}
       <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
         <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
@@ -67,7 +65,6 @@ const DataGrid = ({ title, columns, data }: DataGridProps) => {
         </table>
       </div>
 
-      {/* Footer / Pagination Placeholder (Opsional) */}
       <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex justify-end">
         <div className="flex gap-2">
            <button className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-30" disabled>

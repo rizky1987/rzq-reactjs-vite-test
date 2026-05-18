@@ -11,13 +11,11 @@ export default function SidebarWrapper({ children }: SidebarWrapperProps) {
 
   return (
     <div className="relative flex">
-      {/* Container Utama Sidebar dengan Animasi Transisi */}
       <aside
         className={`${
           isOpen ? "w-64" : "w-20"
         } min-h-screen bg-blue-700 text-white transition-all duration-300 ease-in-out relative flex flex-col justify-between`}
       >
-        {/* Tombol Toggle Buka/Tutup */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="absolute -right-3 top-6 bg-blue-600 hover:bg-blue-800 text-white border border-blue-500 rounded-full p-1.5 shadow-md z-50 transition"

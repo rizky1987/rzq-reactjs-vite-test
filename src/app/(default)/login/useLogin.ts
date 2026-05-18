@@ -28,7 +28,6 @@ export function useLogin() {
         throw new Error(data.error || 'Terjadi kesalahan saat login');
       }
 
-      // Berhasil login, arahkan ke dashboard utama
       router.push('/product');
       router.refresh();
     } catch (err: any) {

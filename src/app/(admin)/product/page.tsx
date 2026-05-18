@@ -12,7 +12,7 @@ import { useProductList } from "./hooks/useProductList";
 import { Product } from "@/app/(admin)/product/types/product.type";
 
 export default function ProductList() {
-  // 💡 Ambil fungsi refreshProducts dari custom hook kamu
+
   const {
     products,
     refreshProducts,
@@ -54,14 +54,13 @@ export default function ProductList() {
       msg: message,
     });
 
-    // 💡 JIKA BERHASIL CREATE/UPDATE, LANGSUNG REFRESH DATA DARI DATABASE
     if (alertType === "success") {
       refreshProducts();
     }
   };
 
   const doCreate = () => {
-    setSelectedProduct(null); // Bersihkan sisa data edit sebelumnya agar form kosong
+    setSelectedProduct(null);
     setIsCreateOpen(true);
     setProcessOptionCreateUpdate("create");
   };

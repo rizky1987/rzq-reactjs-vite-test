@@ -1,31 +1,19 @@
-"use client"
-import { useState, useTransition } from 'react';
-import { handleServerLogout } from "@/app/actions/auth";
+"use client";
+
+import { useTopbar } from './useTopbar';
 
 const Topbar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isPending, startTransition] = useTransition();
-
-  const handleLogout = () => {
-    // 1. Tutup dropdown terlebih dahulu agar UI terasa responsif
-    setShowDropdown(false);
-
-    // 2. Jalankan Server Action di dalam transisi aman Next.js
-    startTransition(async () => {
-      try {
-        await handleServerLogout();
-      } catch (error) {
-        console.error("Terjadi kesalahan saat logout:", error);
-        // Pelarian darurat jika komunikasi server benar-benar putus
-        window.location.href = '/login';
-      }
-    });
-  };
+  const {
+    showDropdown,
+    isPending,
+    handleLogout,
+    toggleDropdown,
+    closeDropdown,
+  } = useTopbar();
 
   return (
     <nav className="sticky top-0 z-30 flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 shadow-sm">
       
-      {/* Kiri: Sidebar Toggle (Mobile) & Search */}
       <div className="flex items-center flex-1">
         <button 
           className="p-2 mr-3 text-blue-600 rounded-full md:hidden hover:bg-gray-100 focus:outline-none"
@@ -33,7 +21,6 @@ const Topbar = () => {
           <i className="fa fa-bars text-xl"></i>
         </button>
 
-        {/* Search Input */}
         <form className="hidden sm:flex items-center max-w-xs w-full">
           <div className="relative w-full">
             <input 
@@ -48,10 +35,8 @@ const Topbar = () => {
         </form>
       </div>
 
-      {/* Kanan: Icons & User Profile */}
       <div className="flex items-center space-x-4">
         
-        {/* Notifications */}
         <div className="flex items-center space-x-2">
           <button className="relative p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-50 rounded-full transition-colors">
             <i className="fas fa-bell fa-fw"></i>
@@ -68,19 +53,15 @@ const Topbar = () => {
           </button>
         </div>
 
-        {/* Divider Vertical */}
         <div className="hidden sm:block h-8 w-px bg-gray-200"></div>
 
-        {/* User Dropdown */}
         <div className="relative">
           <button 
-            onClick={() => !isPending && setShowDropdown(!showDropdown)}
+            onClick={toggleDropdown}
             disabled={isPending}
             className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-all focus:outline-none disabled:opacity-50"
           >
-            <span className="hidden lg:inline text-sm font-medium text-gray-600">
-              {/* {userName} */}
-            </span>
+            <span className="hidden lg:inline text-sm font-medium text-gray-600"></span>
             <img 
               className="h-8 w-8 rounded-full border-2 border-blue-500 object-cover" 
               src="https://startbootstrap.github.io/startbootstrap-sb-admin-2/img/undraw_profile.svg" 
@@ -88,13 +69,11 @@ const Topbar = () => {
             />
           </button>
 
-          {/* Dropdown Menu */}
           {showDropdown && (
             <>
-              {/* Overlay untuk menutup dropdown */}
               <div 
                 className="fixed inset-0 z-40" 
-                onClick={() => setShowDropdown(false)}
+                onClick={closeDropdown}
               ></div>
               
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in duration-150">
@@ -109,7 +88,6 @@ const Topbar = () => {
                 
                 <div className="my-1 border-t border-gray-100"></div>
                 
-                {/* 🔥 Tombol Logout Terkunci Aman */}
                 <button 
                   onClick={handleLogout}
                   disabled={isPending}

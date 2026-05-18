@@ -1,4 +1,3 @@
-// 📄 src/components/modals/CreateProductModal.tsx (atau sesuaikan dengan jalur folder Anda)
 import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Title from '@/components/ui/Title';
@@ -20,7 +19,6 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Synchronize state ketika modal dibuka atau mendeteksi perubahan data produk (saat edit)
   useEffect(() => {
     if (isOpen) {
       if (product && process === 'update') {
@@ -34,13 +32,11 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
 
   if (!isOpen) return null;
 
-  // Validasi Input di Sisi Client
   const validate = () => {
     const newErrors: any = {};
     if (!name.trim()) newErrors.name = "Product name is required";
     if (!desc.trim()) newErrors.desc = "Description is required";
     
-    // Gambar hanya wajib diisi saat membuat produk baru, jika update boleh dikosongkan (keep existing)
     if (!image && process === 'create') {
       newErrors.image = "Product image is required";
     }
@@ -49,7 +45,6 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handler Submit Form ke Database via API Route
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -60,27 +55,34 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
       let response;
       
       if (process === 'create') {
-        // 🚀 REQUEST POST: Tambah Produk Baru
+        const createPayload = {
+          name: name.trim(),
+          description: desc.trim(),
+          price: 150.0,
+          stock: 10,        
+          image: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=800&q=80",
+          status: "In Stock"
+        };
+
         response = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            name: name.trim(), 
-            description: desc.trim() 
-          }),
+          body: JSON.stringify(createPayload), 
         });
+
       } else {
-        // 🚀 REQUEST PUT: Perbarui Produk Berdasarkan ID (UUID)
+        const updatePayload = {
+          id: product?.id, 
+          name: name.trim(),
+          description: desc.trim(),
+        };
+
         response = await fetch("/api/products", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            id: product?.id, 
-            name: name.trim(), 
-            description: desc.trim() 
-          }),
+          body: JSON.stringify(updatePayload), 
         });
-      }
+  }
 
       const result = await response.json();
 
@@ -88,12 +90,10 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
         throw new Error(result.error || "Something went wrong on the server");
       }
       
-      // Jika Berhasil:
       resetForm();
       setIsLoading(false);
-      onClose(); // Tutup Modal
+      onClose(); 
       
-      // Picu trigger alert sukses di halaman utama
       onModalClose(
         process === 'create' 
           ? "Product Created Successfully!" 
@@ -102,15 +102,13 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
       );
 
     } catch (err) {
+
       setIsLoading(false);
       const errorMessage = err instanceof Error ? err.message : String(err);
-      
-      // Jangan langsung tutup modal jika gagal, agar user bisa melihat letak kesalahannya
       onModalClose(errorMessage, "danger");
     }
   };
 
-  // Fungsi Pembersih Form
   const resetForm = () => {
     setName('');
     setDesc('');
@@ -121,16 +119,13 @@ const CreateProductModal = ({ isOpen, onClose, onSuccess: onModalClose, process,
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Overlay dengan blur */}
       <div 
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       />
 
-      {/* Modal Card */}
       <div className="relative bg-white w-full max-w-md shadow-2xl rounded-t-2xl sm:rounded-xl overflow-hidden transform transition-all animate-in fade-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 duration-300">
         
-        {/* Loading Overlay */}
         {isLoading && (
           <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-white/90 backdrop-blur-[2px]">
             <div className="relative flex items-center justify-center">

@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 interface AlertProps {
   type: 'success' | 'danger' | 'warning';
   message: string;
-  duration?: number; // Opsional: durasi dalam milidetik
-  onClose: () => void; // Fungsi untuk mengubah state di parent
+  duration?: number;
+  onClose: () => void;
 }
 
 const Alert = ({ type, message, duration = 3000, onClose }: AlertProps) => {
@@ -23,10 +23,10 @@ const Alert = ({ type, message, duration = 3000, onClose }: AlertProps) => {
   // Logika Timeout
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose(); // Jalankan fungsi tutup setelah durasi habis
+      onClose(); 
     }, duration);
 
-    return () => clearTimeout(timer); // Bersihkan timer jika komponen unmount
+    return () => clearTimeout(timer);
   }, [onClose, duration]);
 
   return (

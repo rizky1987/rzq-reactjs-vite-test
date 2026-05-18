@@ -1,19 +1,27 @@
-import prisma  from "@/lib/prisma";
+import prisma from "@/lib/prisma";
+import { Product } from "@/app/(admin)/product/types/product.type";
 
-/**
- * Fungsi untuk mengambil seluruh data produk dari database PostgreSQL.
- */
-export async function getProducts() {
-  try {
-    const products = await prisma.product.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    
-    return products;
-  } catch (error) {
-    console.error("❌ Gagal mengambil data produk dari database:", error);
-    throw new Error("Internal Server Error");
-  }
+export async function getProducts(): Promise<Product[]> {
+  return await prisma.product.findMany({ orderBy: { createdAt: 'desc' } }) as Product[];
+}
+
+export async function createProduct(data: Omit<Product, "id">) {
+  return await prisma.product.create({
+    data: {
+      ...data,
+    }
+  });
+}
+
+export async function updateProduct(id: string, data: Partial<Omit<Product, "id">>) {
+  return await prisma.product.update({
+    where: { id },
+    data: {
+      ...data,
+    },
+  });
+}
+
+export async function deleteProduct(id: string) {
+  return await prisma.product.delete({ where: { id } });
 }

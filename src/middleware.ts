@@ -1,34 +1,41 @@
+// 📄 src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
-import { menus } from '@/components/layout/sidebar/sidebar.actions'; 
+
+// 🟢 PERBAIKAN: Ambil langsung dari file menus murni (Bebas dari kontaminasi ioredis)
+import { ALL_MENUS } from '@/components/layout/sidebar/sidebar.menus'; 
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Cari tahu apakah URL yang sedang dibuka user terdaftar di config menu kita
-  // Menggunakan startsWith agar sub-route seperti /dashboard/settings tetap ikut kecocok
-  const matchingMenu = menus.find((menu) => pathname.startsWith(menu.href));
+  if (
+    pathname === '/login' || 
+    pathname === '/unauthorized' || 
+    pathname.startsWith('/_next')
+  ) {
+    return NextResponse.next();
+  }
 
-  // 2. Jika rute tersebut memiliki batasan roles, kita lakukan proteksi
+  const matchingMenu = ALL_MENUS.find((menu) => pathname.startsWith(menu.href));
+
   if (matchingMenu && matchingMenu.roles) {
     const token = request.cookies.get('auth_token')?.value;
 
-    // Jika butuh role tapi token tidak ada, langsung tendang ke /login
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
     try {
-      // 3. Verifikasi token JWT
       const secret = new TextEncoder().encode(
         process.env.JWT_SECRET || 'fallback_secret_lokal_sementara'
       );
       const { payload } = await jwtVerify(token, secret);
       
       const userRole = (payload.role as string)?.toUpperCase();
+      const isAuthorized = matchingMenu.roles.some((menuRole) => menuRole === userRole);
 
-      if (!userRole || !matchingMenu.roles.includes(userRole as any)) {
+      if (!userRole || !isAuthorized) {
         console.log(`🔒 Akses ditolak! Role [${userRole}] dilarang membuka [${pathname}]`);
         return NextResponse.redirect(new URL('/unauthorized', request.url));
       }
@@ -44,13 +51,8 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-/*
-|--------------------------------------------------------------------------
-| CONFIG MATCHMENT MIDDLEWARE
-|--------------------------------------------------------------------------
-*/
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|unauthorized|login).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

@@ -12,16 +12,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Akses ditolak, token tidak ditemukan' }, { status: 401 });
     }
 
-    // 1. Verifikasi JWT Struktur & Signature
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string };
 
-    // 2. Verifikasi ke Redis untuk memastikan token belum di-logout
     const isTokenActive = await redis.get(`token:${token}`);
     if (!isTokenActive) {
       return NextResponse.json({ error: 'Sesi Anda telah berakhir (Token Invalid)' }, { status: 401 });
     }
 
-    // Jika semua valid, kembalikan data rahasia
     return NextResponse.json({
       message: 'Akses diterima! Data rahasia berhasil dimuat.',
       secretData: [

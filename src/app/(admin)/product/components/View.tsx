@@ -15,11 +15,7 @@ interface ProductViewModalProps {
 const ViewProductModal = ({ isOpen, onClose, proccess, product, onSuccess: onModalClose }: ProductViewModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Jika modal ditutup atau data produk belum di-set, jangan render apa-apa
   if (!isOpen || !product) return null;
-
-  // Fungsi untuk mengeksekusi penghapusan ke database
-  // 📄 Perbaikan di dalam src/app/(admin)/product/components/View.tsx
 
 const handleDelete = async () => {
     setIsLoading(true);
@@ -37,7 +33,6 @@ const handleDelete = async () => {
       setIsLoading(false);
       onClose();
       
-      // 💡 BERI PENGAMAN: Hanya jalankan jika onModalClose dikirim oleh parent
       if (typeof onModalClose === "function") {
         onModalClose("Product Deleted Successfully!", "success");
       }
@@ -46,11 +41,9 @@ const handleDelete = async () => {
       setIsLoading(false);
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
       
-      // 💡 BERI PENGAMAN JUGA DI SINI
       if (typeof onModalClose === "function") {
         onModalClose(errorMessage, "danger");
       } else {
-        // Fallback jika tidak ada fungsi handle alert dari parent
         alert(errorMessage); 
       }
     }
@@ -58,10 +51,8 @@ const handleDelete = async () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      {/* Modal Card */}
       <div className="relative bg-white p-3 rounded-xl shadow-xl w-full max-w-md flex flex-col overflow-hidden max-h-[90vh]">
         
-        {/* Loading Overlay untuk proses Delete */}
         {isLoading && (
           <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-white/95 backdrop-blur-[1px]">
             <div className="h-12 w-12 rounded-full border-4 border-red-100 border-t-red-600 animate-spin"></div>
@@ -78,10 +69,8 @@ const handleDelete = async () => {
           </div>
         )}
 
-        {/* Scrollable Area */}
         <div className="overflow-y-auto p-4 space-y-4">
           
-          {/* Kontainer Gambar Dinamis dari DB */}
           <div className="relative">
             <img 
               className="rounded-lg w-full bg-gray-100" 
@@ -91,7 +80,6 @@ const handleDelete = async () => {
             />
           </div>
 
-          {/* Konten Text Dinamis dari DB */}
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
               {product.status || "In Stock"}
@@ -104,7 +92,6 @@ const handleDelete = async () => {
           </div>
         </div>
 
-        {/* Action Footer Buttons */}
         <div className="p-3 bg-gray-50 border-t border-gray-100 flex justify-end space-x-2">
           <Button 
             variant="secondary"
@@ -119,7 +106,7 @@ const handleDelete = async () => {
             <Button 
               variant="danger"
               buttonType="delete"
-              onClick={handleDelete} // 🔥 Panggil fungsi hapus database asli
+              onClick={handleDelete}
               disabled={isLoading}
             >
               Delete

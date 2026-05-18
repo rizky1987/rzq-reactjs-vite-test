@@ -8,7 +8,6 @@ const Footer = () => {
             <span className="text-blue-600 font-bold uppercase">Rizky Mochammad Soleh</span>
           </span>
           
-          {/* Opsional: Tambahkan pemisah atau info tambahan yang hanya muncul di desktop */}
           <span className="hidden md:inline text-gray-300">|</span>
           <span className="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest">
             All Rights Reserved

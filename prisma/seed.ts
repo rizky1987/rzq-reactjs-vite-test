@@ -6,7 +6,6 @@ import path from 'path';
 import { seedProducts } from './seeds/product.seed';
 import { seedUsers } from './seeds/user.seed';
 
-// 💡 TRICK AMAN: Paksa baca file .env secara manual jika process.env kosong
 if (!process.env.DATABASE_URL) {
   try {
     const envPath = path.resolve(process.cwd(), '.env');
@@ -36,17 +35,17 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-// Buat pool koneksi dengan jaminan DATABASE_URL berupa string aman
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Start database seeding...');
+  console.log('Start database seeding...');
+  
   await seedUsers(prisma);
   await seedProducts(prisma);
-  // await seedProducts(prisma); // Aktifkan jika file product seed kamu sudah siap
-  console.log('\n🏁 All database seeds completed successfully!');
+  
+  console.log('\n All database seeds completed successfully!');
 }
 
 main()

@@ -1,4 +1,4 @@
-import Sidebar from "@/components/layout/sidebar/sidebar";
+import Sidebar from "@/components/layout/sidebar/Sidebar";
 export default async function DefaultLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex">
