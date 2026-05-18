@@ -19,11 +19,7 @@ export async function handleServerLogout() {
 
       cookieStore.delete("auth_token");
     }
-
-    await signOut({ 
-      redirectTo: "/login", 
-    });
-
+    await signOut({ redirect: false });
   } catch (error) {
     if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
       throw error;

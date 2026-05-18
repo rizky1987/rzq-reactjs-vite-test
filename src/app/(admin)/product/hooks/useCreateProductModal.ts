@@ -57,6 +57,7 @@ export const useCreateProductModal = ({ isOpen, onClose, process, product, onSuc
     
     setIsLoading(true);
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       let response;
       
       if (process === 'create') {
