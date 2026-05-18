@@ -1,30 +1,48 @@
 version: "3.9"
 
 services:
-  # --- DATABASE UTAMA (POSTGRESQL) ---
   db:
     image: postgres:16-alpine
-    container_name: admin-dashboard-db
+    container_name: rzq-react-vite-db
     ports:
-      - "5433:5432" # Diakses dari komputer lokal lewat port 5433
+      - "5432:5432" 
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password_kamu
-      POSTGRES_DB: admin-dashboard
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: rzq-reactjs-vite
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  # --- CACHE & SESSION STORE (REDIS) ---
   redis:
     image: redis:7-alpine
-    container_name: admin-dashboard-redis
+    container_name: rzq-react-vite-redis
     ports:
-      - "6379:6379" # Port standar Redis untuk diakses oleh Next.js/ioredis
+      - "6379:6379" 
     volumes:
-      - redis_data:/data # Menyimpan data Redis secara persisten ke volume Docker
+      - redis_data:/data 
     restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rzq-react-vite-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:password123@db:5432/rzq-reactjs-vite
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - db
+      - redis
+    command: |
+      sh -c "npx prisma generate && npm run migration:run && npm run seed ; npm run dev"
 
 volumes:
   postgres_data:
-  redis_data: # Mendaftarkan volume baru khusus untuk data Redis
+  redis_data:
